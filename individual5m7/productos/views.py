@@ -108,3 +108,26 @@ def listar_con_cursor(request):
             productos_data.append(dict(zip(columns, row)))
     
     return render(request, 'productos/cursor.html', {'productos': productos_data})
+
+# Ejercicio 11: Procedimientos almacenados
+def productos_procedimiento(request):
+    precio_minimo = request.GET.get('precio_min', 50)
+    productos_data = []
+    
+    with connection.cursor() as cursor:
+        # Llamar al procedimiento almacenado
+        cursor.callproc('obtener_productos_por_precio', [precio_minimo])
+        
+        # Obtener resultados
+        for row in cursor.fetchall():
+            productos_data.append({
+                'id': row[0],
+                'nombre': row[1],
+                'precio': row[2],
+                'disponible': row[3]
+            })
+    
+    return render(request, 'productos/procedimiento.html', {
+        'productos': productos_data,
+        'precio_minimo': precio_minimo
+    })
