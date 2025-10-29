@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import F, ExpressionWrapper, DecimalField
+from django.db import connection
 from .models import Producto
 
 # Ejercicio 1: Recuperar todos los productos
@@ -67,3 +68,43 @@ def productos_raw_parametros(request):
         'productos': productos,
         'precio_minimo': precio_minimo
     })
+
+# Ejercicio 9: SQL personalizado con cursor
+def insertar_producto_sql(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        precio = request.POST.get('precio')
+        disponible = request.POST.get('disponible', True)
+        
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO productos_producto (nombre, precio, disponible) VALUES (%s, %s, %s)",
+                [nombre, precio, disponible]
+            )
+        
+        return HttpResponse("Producto insertado correctamente")
+    
+    return render(request, 'productos/insertar_sql.html')
+
+def actualizar_producto_sql(request, producto_id):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "UPDATE productos_producto SET precio = precio * 1.10 WHERE id = %s",
+            [producto_id]
+        )
+    
+    return HttpResponse(f"Producto {producto_id} actualizado")
+
+# Ejercicio 10: Conexiones y cursores
+def listar_con_cursor(request):
+    productos_data = []
+    
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, nombre, precio, disponible FROM productos_producto")
+        
+        # Recuperar datos
+        columns = [col[0] for col in cursor.description]
+        for row in cursor.fetchall():
+            productos_data.append(dict(zip(columns, row)))
+    
+    return render(request, 'productos/cursor.html', {'productos': productos_data})
