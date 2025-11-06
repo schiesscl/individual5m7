@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.db.models import F, ExpressionWrapper, DecimalField
-from django.db import connection
 from .models import Producto
+from django.db.models import F, ExpressionWrapper, DecimalField, Q, Value
+from django.db import connection
+from decimal import Decimal
 
 # Ejercicio 1: Recuperar todos los productos
 def listar_productos(request):
@@ -29,7 +29,11 @@ def productos_filtrados(request):
 
 # Ejercicio 3: Query SQL con raw()
 def productos_raw(request):
-    productos = Producto.objects.raw('SELECT * FROM productos_producto WHERE precio < 100')
+    """
+    Ejercicio 3: Ejecutando Queries SQL desde Django
+    Muestra productos con precio menor a $50 usando raw()
+    """
+    productos = Producto.objects.raw('SELECT * FROM productos_producto WHERE precio < 50')
     return render(request, 'productos/raw.html', {'productos': productos})
 
 # Ejercicio 4: Mapeo de campos con raw()
@@ -48,10 +52,14 @@ def productos_sin_disponible(request):
 
 # Ejercicio 7: Anotaciones
 def productos_con_impuesto(request):
+    """
+    Ejercicio 7: Añadiendo Anotaciones en Consultas
+    Agrega un campo calculado con el precio más 16% de impuesto
+    """
     productos = Producto.objects.annotate(
         precio_con_impuesto=ExpressionWrapper(
-            F('precio') * 1.16,
-            output_field=DecimalField(max_digits=7, decimal_places=2)
+            F('precio') * Value(Decimal('1.19')),
+            output_field=DecimalField(max_digits=10, decimal_places=2)
         )
     )
     return render(request, 'productos/con_impuesto.html', {'productos': productos})

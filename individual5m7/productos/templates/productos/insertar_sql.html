@@ -1,0 +1,74 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 9: SQL Directo{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 9: Ejecutando SQL Personalizado Directamente</h2>
+
+<div class="card">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Insertar Producto usando SQL directo (cursor)</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre del Producto:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="precio" class="form-label">Precio:</label>
+                    <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="disponible" class="form-label">Disponible:</label>
+                    <select class="form-select" id="disponible" name="disponible">
+                        <option value="1" selected>Sí</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Insertar Producto</button>
+            <a href="{% url 'productos:listar' %}" class="btn btn-secondary">Ver Todos los Productos</a>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="alert alert-warning">
+            <h6><strong>SQL usado para INSERT:</strong></h6>
+            <code>INSERT INTO productos_producto (nombre, precio, disponible) VALUES (%s, %s, %s)</code>
+        </div>
+
+        <div class="alert alert-info">
+            <h6><strong>Código Python usado:</strong></h6>
+            <pre><code>with connection.cursor() as cursor:
+    cursor.execute(
+        "INSERT INTO productos_producto (nombre, precio, disponible) VALUES (%s, %s, %s)",
+        [nombre, precio, disponible]
+    )</code></pre>
+        </div>
+
+        <div class="alert alert-danger">
+            <h6><strong>¿Cuándo usar SQL directo?</strong></h6>
+            <ul>
+                <li>✅ Operaciones masivas (bulk operations)</li>
+                <li>✅ Queries muy complejas que el ORM no puede generar eficientemente</li>
+                <li>✅ Procedimientos almacenados</li>
+                <li>✅ Optimizaciones específicas de la base de datos</li>
+                <li>❌ NO usar para operaciones simples CRUD (usar ORM)</li>
+                <li>❌ Pierdes la abstracción de base de datos</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-secondary">
+            <h6><strong>Otras operaciones SQL directas disponibles:</strong></h6>
+            <ul>
+                <li><strong>UPDATE:</strong> <code>UPDATE productos_producto SET precio = precio * 1.10 WHERE id = %s</code></li>
+                <li><strong>DELETE:</strong> <code>DELETE FROM productos_producto WHERE id = %s</code></li>
+                <li><strong>SELECT:</strong> Ya visto en ejercicios anteriores con raw()</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

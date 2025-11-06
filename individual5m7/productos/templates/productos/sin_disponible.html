@@ -1,0 +1,53 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 6: Exclusión de Campos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 6: Exclusión de Campos del Modelo</h2>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Productos (sin campo 'disponible')</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay productos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <h6><strong>Método usado:</strong></h6>
+            <code>Producto.objects.defer('disponible').all()</code>
+        </div>
+
+        <div class="alert alert-info">
+            <h6><strong>Explicación de defer():</strong></h6>
+            <p>El método <code>defer()</code> le indica a Django que NO cargue el campo especificado en la consulta SQL inicial.</p>
+            <ul>
+                <li>✅ Reduce el tamaño de los datos transferidos desde la base de datos</li>
+                <li>✅ Mejora el rendimiento cuando no necesitas todos los campos</li>
+                <li>⚠️ Si intentas acceder al campo excluido, Django hará una consulta adicional automáticamente</li>
+            </ul>
+            <p class="mb-0"><strong>Opuesto:</strong> <code>only('campo1', 'campo2')</code> carga SOLO los campos especificados.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

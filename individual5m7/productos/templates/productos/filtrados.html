@@ -1,0 +1,127 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 2: Filtros{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 2: Aplicando Filtros en Recuperación de Registros</h2>
+
+<!-- Productos con precio mayor a 50 -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Productos con precio mayor a $50</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos_caros %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td class="text-success fw-bold">${{ producto.precio }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay productos con precio mayor a $50</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="alert alert-info">
+            <strong>Filtro usado:</strong> <code>Producto.objects.filter(precio__gt=50)</code>
+        </div>
+    </div>
+</div>
+
+<!-- Productos que empiezan con "A" -->
+<div class="card mb-4">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">Productos cuyo nombre empieza con "A"</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos_a %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td class="text-warning fw-bold">{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay productos que empiecen con "A"</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="alert alert-info">
+            <strong>Filtro usado:</strong> <code>Producto.objects.filter(nombre__startswith='A')</code>
+        </div>
+    </div>
+</div>
+
+<!-- Productos disponibles -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Productos Disponibles</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos_disponibles %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td><span class="badge bg-success">Disponible</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay productos disponibles</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="alert alert-info">
+            <strong>Filtro usado:</strong> <code>Producto.objects.filter(disponible=True)</code>
+        </div>
+    </div>
+</div>
+{% endblock %}

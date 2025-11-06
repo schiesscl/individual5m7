@@ -1,0 +1,80 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 7: Anotaciones{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 7: Añadiendo Anotaciones en Consultas</h2>
+
+<div class="card">
+    <div class="card-header" style="background-color: #28a745; color: white;">
+        <h5 class="mb-0">Productos con Precio + 19% de Impuesto</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead class="table-success">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio Original</th>
+                    <th>Precio con Impuesto (19%)</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio|floatformat:2 }}</td>
+                    <td class="fw-bold text-success">${{ producto.precio_con_impuesto|floatformat:2 }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay productos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <h6><strong>Anotación usada:</strong></h6>
+            <pre><code>Producto.objects.annotate(
+    precio_con_impuesto=ExpressionWrapper(
+        F('precio') * Value(Decimal('1.19')),
+        output_field=DecimalField(max_digits=10, decimal_places=2)
+    )
+)</code></pre>
+        </div>
+
+        <div class="alert alert-info">
+            <h6><strong>Explicación de annotate():</strong></h6>
+            <p>El método <code>annotate()</code> agrega campos calculados temporalmente a cada objeto del QuerySet:</p>
+            <ul>
+                <li><code>F('precio')</code> - Referencia al campo precio de la base de datos</li>
+                <li><code>Value(Decimal('1.19'))</code> - Valor decimal exacto para la multiplicación</li>
+                <li><code>ExpressionWrapper()</code> - Permite operaciones matemáticas complejas</li>
+                <li><code>output_field</code> - Define el tipo de dato del resultado con 2 decimales</li>
+            </ul>
+            <p class="mb-0"><strong>Ventaja:</strong> El cálculo se hace en la base de datos, no en Python.</p>
+        </div>
+
+        <div class="alert alert-success">
+            <h6><strong>¿Por qué usar annotate()?</strong></h6>
+            <ul class="mb-0">
+                <li>✅ El cálculo se realiza en la base de datos (más eficiente)</li>
+                <li>✅ Permite ordenar o filtrar por el campo calculado</li>
+                <li>✅ Reduce la carga en el servidor de aplicaciones</li>
+                <li>✅ El campo calculado está disponible como atributo del objeto</li>
+                <li>✅ Se mantiene precisión decimal sin errores de redondeo</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

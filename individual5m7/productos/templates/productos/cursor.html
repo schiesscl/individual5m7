@@ -1,0 +1,103 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 10: Cursores{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 10: Conexiones y Cursores</h2>
+
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Productos recuperados con cursor manual</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead class="table-info">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay productos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <h6><strong>Código usado con cursor:</strong></h6>
+            <pre><code>with connection.cursor() as cursor:
+    cursor.execute("SELECT id, nombre, precio, disponible FROM productos_producto")
+    
+    # Obtener nombres de columnas
+    columns = [col[0] for col in cursor.description]
+    
+    # Convertir filas en diccionarios
+    for row in cursor.fetchall():
+        productos_data.append(dict(zip(columns, row)))</code></pre>
+        </div>
+
+        <div class="alert alert-info">
+            <h6><strong>¿Qué es un cursor?</strong></h6>
+            <p>Un cursor es un objeto que permite ejecutar consultas SQL y recuperar resultados fila por fila.</p>
+            <ul>
+                <li><code>cursor.execute(sql)</code> - Ejecuta la consulta</li>
+                <li><code>cursor.fetchone()</code> - Obtiene una fila</li>
+                <li><code>cursor.fetchall()</code> - Obtiene todas las filas</li>
+                <li><code>cursor.fetchmany(size)</code> - Obtiene un número específico de filas</li>
+                <li><code>cursor.description</code> - Información sobre las columnas</li>
+            </ul>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">✅ Ventajas de usar cursores</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Control total sobre la consulta SQL</li>
+                            <li>Eficiente para grandes volúmenes de datos</li>
+                            <li>Permite usar características específicas de MySQL</li>
+                            <li>Útil para procedimientos almacenados</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0">❌ Desventajas de usar cursores</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>No aprovecha el ORM de Django</li>
+                            <li>Código menos portable entre bases de datos</li>
+                            <li>Mayor probabilidad de errores</li>
+                            <li>No obtiene instancias del modelo automáticamente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

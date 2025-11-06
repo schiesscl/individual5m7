@@ -1,0 +1,169 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 11: Procedimientos Almacenados{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 11: Invocación a Procedimientos Almacenados</h2>
+
+<div class="card mb-4">
+    <div class="card-header bg-purple text-white" style="background-color: #6f42c1;">
+        <h5 class="mb-0">Productos obtenidos mediante Procedimiento Almacenado</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="precio_min" class="form-label">Precio mínimo:</label>
+                    <input type="number" step="0.01" class="form-control" id="precio_min" 
+                           name="precio_min" value="{{ precio_minimo }}" placeholder="Ej: 50">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay productos con precio mayor o igual a ${{ precio_minimo }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">📋 Información sobre Procedimientos Almacenados</h5>
+    </div>
+    <div class="card-body">
+        <h6 class="text-primary">¿Qué es un Procedimiento Almacenado?</h6>
+        <p>
+            Un procedimiento almacenado es un conjunto de instrucciones SQL que se almacenan en la base de datos 
+            y pueden ser invocadas por su nombre. Son como "funciones" en la base de datos.
+        </p>
+
+        <h6 class="text-primary mt-3">Crear el procedimiento en MySQL:</h6>
+        <pre class="bg-light p-3 rounded"><code>DELIMITER //
+CREATE PROCEDURE obtener_productos_por_precio(IN precio_minimo DECIMAL(5,2))
+BEGIN
+    SELECT * FROM productos_producto WHERE precio >= precio_minimo;
+END //
+DELIMITER ;</code></pre>
+
+        <h6 class="text-primary mt-3">Invocar desde Django:</h6>
+        <pre class="bg-light p-3 rounded"><code>with connection.cursor() as cursor:
+    cursor.callproc('obtener_productos_por_precio', [precio_minimo])
+    
+    for row in cursor.fetchall():
+        productos_data.append({
+            'id': row[0],
+            'nombre': row[1],
+            'precio': row[2],
+            'disponible': row[3]
+        })</code></pre>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">✅ Ventajas</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Mayor rendimiento para operaciones complejas</li>
+                            <li>Reutilización de lógica en la base de datos</li>
+                            <li>Reduce el tráfico de red</li>
+                            <li>Encapsulación de lógica de negocio</li>
+                            <li>Mayor seguridad (control de permisos)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning">
+                        <h6 class="mb-0">⚠️ Consideraciones</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Difícil de versionar con el código</li>
+                            <li>Pueden ser difíciles de debuggear</li>
+                            <li>No portables entre diferentes DBMS</li>
+                            <li>Requiere permisos especiales en producción</li>
+                            <li>Pueden crear dependencias difíciles de rastrear</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <h6><strong>Otros tipos de procedimientos almacenados:</strong></h6>
+            <ul class="mb-0">
+                <li><strong>PROCEDURE:</strong> Ejecuta operaciones (SELECT, INSERT, UPDATE, DELETE)</li>
+                <li><strong>FUNCTION:</strong> Retorna un valor único</li>
+                <li><strong>TRIGGER:</strong> Se ejecuta automáticamente ante eventos (INSERT, UPDATE, DELETE)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">🔧 Comandos útiles de MySQL para procedimientos</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Comando</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>SHOW PROCEDURE STATUS;</code></td>
+                    <td>Listar todos los procedimientos</td>
+                </tr>
+                <tr>
+                    <td><code>SHOW CREATE PROCEDURE nombre;</code></td>
+                    <td>Ver código del procedimiento</td>
+                </tr>
+                <tr>
+                    <td><code>DROP PROCEDURE nombre;</code></td>
+                    <td>Eliminar un procedimiento</td>
+                </tr>
+                <tr>
+                    <td><code>CALL nombre(parametros);</code></td>
+                    <td>Ejecutar un procedimiento</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Ejercicio 4: Mapeo de Campos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Ejercicio 4: Mapeando Campos de Consultas al Modelo</h2>
+
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Productos con precio entre $20 y $80 (Mapeo personalizado)</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead class="table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td>
+                        {% if producto.disponible %}
+                            <span class="badge bg-success">Disponible</span>
+                        {% else %}
+                            <span class="badge bg-danger">No disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No hay productos en este rango de precio</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <h6><strong>Query SQL personalizada:</strong></h6>
+            <code>SELECT id, nombre, precio, disponible FROM productos_producto WHERE precio BETWEEN 20 AND 80</code>
+        </div>
+
+        <div class="alert alert-info">
+            <h6><strong>Explicación del mapeo:</strong></h6>
+            <p>Los campos seleccionados en el SQL se mapean automáticamente a los atributos del modelo Producto:</p>
+            <ul>
+                <li><code>id</code> → producto.id</li>
+                <li><code>nombre</code> → producto.nombre</li>
+                <li><code>precio</code> → producto.precio</li>
+                <li><code>disponible</code> → producto.disponible</li>
+            </ul>
+            <p class="mb-0"><strong>Importante:</strong> El campo <code>id</code> es obligatorio en consultas raw().</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
